@@ -11,8 +11,8 @@
 
 Write your name and email address in the comment space here:
 
-Name:
-Email:
+Name: Kihyeon Kwon
+Email: kihyeon.kwn@gmail.com
 
 (...end multi-line comment.)
 ******************** */
@@ -68,6 +68,24 @@ PNG grayscale(PNG image) {
  */
 PNG createSpotlight(PNG image, int centerX, int centerY) {
 
+
+
+    for (unsigned x = 0; x < image.width(); x++) {
+    for (unsigned y = 0; y < image.height(); y++) {
+      HSLAPixel & pixel = image.getPixel(x, y);
+
+      double distance = sqrt((x-centerX)*(x-centerX) + (y-centerY)*(y-centerY));
+
+      double decreaseAmount = distance * 0.005;
+      if(decreaseAmount >= 0.8){
+        decreaseAmount = 0.8;
+      }
+
+      pixel.l = pixel.l*(1-decreaseAmount);
+    }
+  }
+
+
   return image;
   
 }
@@ -84,6 +102,26 @@ PNG createSpotlight(PNG image, int centerX, int centerY) {
  * @return The illinify'd image.
 **/
 PNG illinify(PNG image) {
+
+  for (unsigned x = 0; x < image.width(); x++) {
+    for (unsigned y = 0; y < image.height(); y++) {
+      HSLAPixel & pixel = image.getPixel(x, y);
+
+      // `pixel` is a reference to the memory stored inside of the PNG `image`,
+      // which means you're changing the image directly. No need to `set`
+      // the pixel since you're directly changing the memory of the image.
+      int orangeDiff = abs(pixel.h - 11)> 180?360-abs(pixel.h - 11):abs(pixel.h - 11);
+      int blueDiff = abs(pixel.h -216)>180?360-abs(pixel.h -216):abs(pixel.h -216);
+
+      if(orangeDiff > blueDiff){
+
+
+        pixel.h = 216;
+      }else{
+        pixel.h = 11;
+      }
+    }
+  }
 
   return image;
 }
@@ -102,6 +140,29 @@ PNG illinify(PNG image) {
 * @return The watermarked image.
 */
 PNG watermark(PNG firstImage, PNG secondImage) {
+  unsigned firstImageWidth = firstImage.width();
+  unsigned firstImageHeight = firstImage.height();
+  unsigned secondImageWidth = secondImage.width();
+  unsigned secondImageHeight = secondImage.height();
+
+  unsigned smallerWidth = firstImageWidth >secondImageWidth? secondImageWidth: firstImageWidth;
+  unsigned smallerHeight = firstImageHeight>secondImageHeight? secondImageHeight:firstImageHeight;
+
+
+
+
+
+  for (unsigned x = 0; x < smallerWidth; x++) {
+    for (unsigned y = 0; y < smallerHeight; y++) {
+      HSLAPixel & firstImagePixel = firstImage.getPixel(x, y);
+      HSLAPixel & secondImagePixel = secondImage.getPixel(x, y);
+
+      if(secondImagePixel.l == 1.0)
+        firstImagePixel.l = (firstImagePixel.l +0.2 >= 1.0) ? 1.0 :  firstImagePixel.l +0.2;
+      };
+    }
+  
+
 
   return firstImage;
 }
